@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const PatanaSchema = new mongoose.Schema({
   patanaType: {
     type: String,
-    enum: ['ISM', 'TERCERO'],
-    default: 'TERCERO'
+    required: [true, "Please tell us whether it's ISM or TERCERO"]
   },
   driver: {
     type: String,
