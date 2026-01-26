@@ -18,7 +18,7 @@ const PatanaSchema = new mongoose.Schema({
     default: null
   },
   placaUnidad: {
-    type: Number,
+    type: String,
     default: null
   } 
 });
