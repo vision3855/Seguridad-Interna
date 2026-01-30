@@ -1,6 +1,7 @@
 const express = require("express");
 const connectDB = require("./db/connect.js");
 const patanaRoutes = require("./routes/patana.routes.js");
+const ingresoRoutes = require("./routes/ingresoPatana.routes.js");
 require("dotenv").config();
 
 const app = express();
@@ -38,6 +39,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/patana", patanaRoutes);
+app.use("/ingreso", ingresoRoutes);
 
 app.get("/", (req, res) => {
   res.send("Well well");
