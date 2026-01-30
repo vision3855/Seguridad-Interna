@@ -38,5 +38,11 @@ const ingresoPatanaSchema = new mongoose.Schema({
     default: 21,
   },
 });
+
+ingresoPatanaSchema.statics.findByDate = function (date){
+  return this.find({dia: date})
+}
+
+
 module.exports = mongoose.model("Ingreso", ingresoPatanaSchema);
 // ready to go!

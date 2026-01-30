@@ -1,5 +1,5 @@
 const express = require('express');
-const { createIngreso, getAllIngreso } = require('../controllers/ingresoPatana.controllers');
+const { createIngreso, getAllIngreso, getByDate } = require('../controllers/ingresoPatana.controllers');
 
 const router = express.Router();
 
@@ -7,6 +7,7 @@ const router = express.Router();
 // define the home page route
 router.post('/', createIngreso)
 router.get('/', getAllIngreso)
+router.post('/date', getByDate)
 
 // define the about route
 router.get('/about', (req, res) => {

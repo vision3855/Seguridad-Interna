@@ -36,4 +36,18 @@ async function getAllIngreso(req, res) {
   }
 }
 
-module.exports = { createIngreso, getAllIngreso };
+async function getByDate(req, res) {
+  try {
+    
+    let result = await Ingreso.findByDate(req.body.dia)
+
+    res.status(StatusCodes.OK).json({ result, count: result.length });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ msg: "error detected" });
+  }
+}
+
+module.exports = { createIngreso, getAllIngreso, getByDate };
