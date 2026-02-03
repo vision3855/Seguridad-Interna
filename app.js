@@ -2,10 +2,13 @@ const express = require("express");
 const connectDB = require("./db/connect.js");
 const patanaRoutes = require("./routes/patana.routes.js");
 const ingresoRoutes = require("./routes/ingresoPatana.routes.js");
+const imageRoutes = require("./routes/image.routes.js");
+
 require("dotenv").config();
 
 const app = express();
 app.use(express.json());
+app.use("/uploads", express.static("uploads"));
 
 const helmet = require("helmet");
 const cors = require("cors");
@@ -38,6 +41,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/api/images", imageRoutes);
 app.use("/patana", patanaRoutes);
 app.use("/ingreso", ingresoRoutes);
 
