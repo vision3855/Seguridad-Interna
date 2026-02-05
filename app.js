@@ -2,7 +2,6 @@ const express = require("express");
 const connectDB = require("./db/connect.js");
 const patanaRoutes = require("./routes/patana.routes.js");
 const ingresoRoutes = require("./routes/ingresoPatana.routes.js");
-const imageRoutes = require("./routes/image.routes.js");
 
 require("dotenv").config();
 
@@ -41,7 +40,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api/images", imageRoutes);
+app.use("/images", require("./routes/images"));
 app.use("/patana", patanaRoutes);
 app.use("/ingreso", ingresoRoutes);
 
