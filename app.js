@@ -2,6 +2,8 @@ const express = require("express");
 const connectDB = require("./db/connect.js");
 const patanaRoutes = require("./routes/patana.routes.js");
 const ingresoRoutes = require("./routes/ingresoPatana.routes.js");
+//const imageRoutes = require('./routes/imagesRoutes');
+const imageRoutes = require('./routes/imagesRoute.js');
 
 require("dotenv").config();
 
@@ -23,8 +25,17 @@ app.use(
 );
 app.use(express.json());
 
-app.use(helmet());
-app.use(cors());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
+
+app.use(cors({
+  origin: '*', // Allow all origins, or specify your React app URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 const sanitize = (obj) => {
   for (const key in obj) {
     if (typeof obj[key] === "string") {
@@ -32,6 +43,7 @@ const sanitize = (obj) => {
     }
   }
 };
+app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   sanitize(req.body);
@@ -40,7 +52,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/images", require("./routes/images"));
+app.use('/api/images', imageRoutes);
 app.use("/patana", patanaRoutes);
 app.use("/ingreso", ingresoRoutes);
 
