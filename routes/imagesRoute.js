@@ -1,35 +1,38 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const multer = require('multer');
-const path = require('path');
-const Image = require('../models/image');
+const multer = require("multer");
+const path = require("path");
+const Image = require("../models/image");
+const mongoose = require('mongoose');
 
 // Configure multer for memory storage
 const storage = multer.memoryStorage();
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
+    fileSize: 5 * 1024 * 1024, // 5MB limit
   },
   fileFilter: (req, file, cb) => {
     const filetypes = /jpeg|jpg|png|gif|webp/;
     const mimetype = filetypes.test(file.mimetype);
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    
+    const extname = filetypes.test(
+      path.extname(file.originalname).toLowerCase(),
+    );
+
     if (mimetype && extname) {
       return cb(null, true);
     }
-    cb(new Error('Only image files are allowed!'));
-  }
+    cb(new Error("Only image files are allowed!"));
+  },
 });
 
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const images = await Image.find({}, { 'image.data': 0 });
+    const images = await Image.find({}, { "image.data": 0 });
     res.json({
       success: true,
       count: images.length,
-      images
+      images,
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -37,9 +40,9 @@ router.get('/', async (req, res) => {
 });
 
 // GET image metadata FIRST
-router.get('/metadata/:id', async (req, res) => {
+router.get("/metadata/:id", async (req, res) => {
   try {
-    const image = await Image.findById(req.params.id, { 'image.data': 0 });
+    const image = await Image.findById(req.params.id, { "image.data": 0 });
     if (!image) return res.status(404).json({ success: false });
     res.json({ success: true, image });
   } catch (error) {
@@ -47,29 +50,42 @@ router.get('/metadata/:id', async (req, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
-  try {
-    const image = await Image.findById(req.params.id);
-    if (!image) return res.status(404).json({ success: false });
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
 
-    res.set('Content-Type', image.image.contentType);
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).send("Invalid image id");
+  }
+
+  try {
+    const image = await Image.findById(id);
+
+    if (!image || !image.image?.data) {
+      return res.status(404).send("Image not found");
+    }
+
+    res.set({
+      "Content-Type": image.image.contentType,
+      "Cache-Control": "public, max-age=31536000, immutable",
+    });
+
     res.send(image.image.data);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).send("Server error");
   }
 });
 
 // @route   POST /api/images/upload
 // @desc    Upload image to MongoDB
 // @access  Public (add your auth middleware if needed)
-router.post('/upload', upload.single('image'), async (req, res) => {
-  try {
+router.post("/upload", upload.single("image"), async (req, res) => {
+  /* try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file provided' });
     }
 
     const newImage = new Image({
-      name: req.file.originalname,
+      ...req.body,
       image: {
         data: req.file.buffer,
         contentType: req.file.mimetype
@@ -91,13 +107,95 @@ router.post('/upload', upload.single('image'), async (req, res) => {
       success: false,
       error: error.message 
     });
+  } */
+
+  try {
+    // Extract data from request body
+    const {
+      hourIn,
+      name,
+      idNumber,
+      business,
+      zoneVisited,
+      visitMotif,
+      authorizedBy,
+      hourOut,
+    } = req.body;
+
+    // Handle image file if uploaded (using multer or similar middleware)
+    let imageData = null;
+    if (req.file) {
+      imageData = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      };
+    }
+
+    // Create new image record
+    const newImage = new Image({
+      hourIn,
+      name,
+      idNumber,
+      business,
+      zoneVisited: zoneVisited || "distribucion y caja",
+      visitMotif: visitMotif || "pagar pedido",
+      authorizedBy: authorizedBy || "Ventas",
+      hourOut,
+      image: imageData,
+    });
+
+    // Save to database
+    const savedImage = await newImage.save();
+
+    // Return success response
+    res.status(201).json({
+      success: true,
+      message: "Image record created successfully",
+      data: {
+        id: savedImage._id,
+        name: savedImage.name,
+        idNumber: savedImage.idNumber,
+        business: savedImage.business,
+        hourIn: savedImage.hourIn,
+        hourOut: savedImage.hourOut,
+        zoneVisited: savedImage.zoneVisited,
+        visitMotif: savedImage.visitMotif,
+        authorizedBy: savedImage.authorizedBy,
+        hasImage: !!savedImage.image.data,
+      },
+    });
+  } catch (error) {
+    // Handle specific error cases
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "ID number already exists",
+        error: "Duplicate ID number",
+      });
+    }
+
+    // Handle validation errors
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: messages,
+      });
+    }
+
+    // Generic error response
+    res.status(500).json({
+      success: false,
+      message: "Failed to create image record",
+      error: error.message,
+    });
   }
 });
 
 // @route   GET /api/images
 // @desc    Get all images (metadata only, no binary data)
 // @access  Public
-
 
 /* router.get('/', async (req, res) => {
   try {
@@ -171,26 +269,26 @@ router.get('/metadata/:id', async (req, res) => {
 // @route   DELETE /api/images/:id
 // @desc    Delete image by ID
 // @access  Public (add your auth middleware if needed)
-router.delete('/:id', async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
     const image = await Image.findByIdAndDelete(req.params.id);
-    
+
     if (!image) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        error: 'Image not found' 
+        error: "Image not found",
       });
     }
 
-    res.json({ 
+    res.json({
       success: true,
-      message: 'Image deleted successfully' 
+      message: "Image deleted successfully",
     });
   } catch (error) {
-    console.error('Delete error:', error);
-    res.status(500).json({ 
+    console.error("Delete error:", error);
+    res.status(500).json({
       success: false,
-      error: error.message 
+      error: error.message,
     });
   }
 });
