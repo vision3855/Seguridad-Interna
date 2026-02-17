@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const path = require("path");
 const Image = require("../models/image");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 // Configure multer for memory storage
 const storage = multer.memoryStorage();
@@ -28,7 +28,14 @@ const upload = multer({
 
 router.get("/", async (req, res) => {
   try {
-    const images = await Image.find({}, { "image.data": 0 });
+    const { name } = req.query;
+    const queryObj = {};
+    if (name) {
+      queryObj.name = { $regex: name, $options: "i" };
+    }
+    let result = Image.find(queryObj, { "image.data": 0 });
+    const images = await result;
+    //const images = await Image.find({}, { "image.data": 0 });
     res.json({
       success: true,
       count: images.length,

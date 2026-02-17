@@ -4,6 +4,7 @@ const patanaRoutes = require("./routes/patana.routes.js");
 const ingresoRoutes = require("./routes/ingresoPatana.routes.js");
 //const imageRoutes = require('./routes/imagesRoutes');
 const imageRoutes = require('./routes/imagesRoute.js');
+const visitRoutes = require('./routes/visitReport.route.js');
 
 require("dotenv").config();
 
@@ -33,9 +34,12 @@ app.use(
 
 app.use(cors({
   origin: '*', // Allow all origins, or specify your React app URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   credentials: true
 }));
+
+//patch test
+
 const sanitize = (obj) => {
   for (const key in obj) {
     if (typeof obj[key] === "string") {
@@ -55,6 +59,7 @@ app.use((req, res, next) => {
 app.use('/api/images', imageRoutes);
 app.use("/patana", patanaRoutes);
 app.use("/ingreso", ingresoRoutes);
+app.use("/visit", visitRoutes);
 
 app.get("/", (req, res) => {
   res.send("Well well");
