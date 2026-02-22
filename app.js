@@ -16,6 +16,7 @@ const helmet = require("helmet");
 const cors = require("cors");
 const xss = require("xss");
 const rateLimiter = require("express-rate-limit");
+const authRoutes = require('./routes/authRoutes');
 
 app.set("trust proxy", 1);
 app.use(
@@ -56,6 +57,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/api/auth', authRoutes)
 app.use('/api/images', imageRoutes);
 app.use("/patana", patanaRoutes);
 app.use("/ingreso", ingresoRoutes);
