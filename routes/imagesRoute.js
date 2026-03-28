@@ -4,6 +4,7 @@ const multer = require("multer");
 const path = require("path");
 const Image = require("../models/image");
 const mongoose = require("mongoose");
+const authMiddleware = require("../middleware/auth");
 
 // Configure multer for memory storage
 const storage = multer.memoryStorage();
