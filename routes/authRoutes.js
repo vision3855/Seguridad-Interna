@@ -12,6 +12,7 @@ router.post('/logout', authController.logout);
 router.use(authMiddleware.protect);
 
 router.get('/me', authController.getMe);
+router.get('/users/:id', authController.getUserById);
 router.put('/profile', authController.updateProfile);
 router.post('/change-password', authController.changePassword);
 

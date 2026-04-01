@@ -27,7 +27,7 @@ const upload = multer({
   },
 });
 
-router.get("/", async (req, res) => {
+router.get("/", authMiddleware.protect, async (req, res) => {
   try {
     const { name } = req.query;
     const queryObj = {};
@@ -48,7 +48,7 @@ router.get("/", async (req, res) => {
 });
 
 // GET image metadata FIRST
-router.get("/metadata/:id", async (req, res) => {
+router.get("/metadata/:id", authMiddleware.protect, async (req, res) => {
   try {
     const image = await Image.findById(req.params.id, { "image.data": 0 });
     if (!image) return res.status(404).json({ success: false });
@@ -58,7 +58,7 @@ router.get("/metadata/:id", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", authMiddleware.protect, async (req, res) => {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -86,7 +86,7 @@ router.get("/:id", async (req, res) => {
 // @route   POST /api/images/upload
 // @desc    Upload image to MongoDB
 // @access  Public (add your auth middleware if needed)
-router.post("/upload", upload.single("image"), async (req, res) => {
+router.post("/upload", authMiddleware.protect, upload.single("image"), async (req, res) => {
   /* try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file provided' });
@@ -150,6 +150,7 @@ router.post("/upload", upload.single("image"), async (req, res) => {
       authorizedBy: authorizedBy || "Ventas",
       hourOut,
       image: imageData,
+      createdBy: req.user.id
     });
 
     // Save to database

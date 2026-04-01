@@ -3,7 +3,7 @@ const Patana = require("../models/Patana.model");
 
 async function newPatana(req, res) {
   try {
-    const patana = await Patana.create(req.body);
+    const patana = await Patana.create({createdBy: req.user.id, ...req.body});
     res.status(StatusCodes.CREATED).json({ patana });
   } catch (error) {
     console.log(error);

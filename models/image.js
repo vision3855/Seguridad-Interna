@@ -1,43 +1,47 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const imageSchema = new mongoose.Schema({
   hourIn: {
     type: String,
-    required: true
+    required: true,
   },
   name: {
     type: String,
-    required: true
+    required: true,
   },
   idNumber: {
     type: Number,
     required: true,
-    unique: true
+    unique: true,
   },
   business: {
     type: String,
-    required: true
+    required: true,
   },
   zoneVisited: {
     type: String,
-    default: 'distribucion y caja'
+    default: "distribucion y caja",
   },
   visitMotif: {
     type: String,
-    default: 'pagar pedido'
+    default: "pagar pedido",
   },
   authorizedBy: {
     type: String,
-    default: 'Ventas'
+    default: "Ventas",
   },
   hourOut: {
     type: String,
-    required: true
+    required: true,
   },
   image: {
     data: Buffer,
-    contentType: String
+    contentType: String,
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
   },
 });
 
-module.exports = mongoose.model('Image', imageSchema);
+module.exports = mongoose.model("Image", imageSchema);

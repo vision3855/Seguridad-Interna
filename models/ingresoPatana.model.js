@@ -37,6 +37,10 @@ const ingresoPatanaSchema = new mongoose.Schema({
     type: Number,
     default: 21,
   },
+  createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
 });
 
 ingresoPatanaSchema.statics.findByDate = function (date){

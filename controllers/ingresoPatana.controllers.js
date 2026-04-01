@@ -7,7 +7,7 @@ async function createIngreso(req, res) {
 
     const todayFormatted = date.toLocaleDateString("en-GB");
 
-    const data = {dia:todayFormatted, ...req.body};
+    const data = {dia:todayFormatted, createdBy: req.user.id, ...req.body};
     const ingreso = await Ingreso.create(data);
     res.status(StatusCodes.CREATED).json({ ingreso, success: true });
   } catch (error) {

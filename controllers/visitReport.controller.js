@@ -6,7 +6,7 @@ const createVisits = async (req, res) => {
   const todayFormatted = date.toLocaleDateString("en-GB");
 
   try {
-    const visit = new visitReport({dia: todayFormatted, ...req.body});
+    const visit = new visitReport({dia: todayFormatted, createdBy: req.user.id, ...req.body});
     const savedVisit = await visit.save();
     res.status(201).json({
       success: true,

@@ -20,7 +20,11 @@ const PatanaSchema = new mongoose.Schema({
   placaUnidad: {
     type: String,
     default: null
-  } 
+  },
+  createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
 });
 module.exports = mongoose.model('Patana', PatanaSchema);
 // ready to go!

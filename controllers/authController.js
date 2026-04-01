@@ -282,6 +282,22 @@ const authController = {
     }
   },
 
+  getUserById: async (req, res) => {
+  try {
+    const { id } = req.params; // get id from request params
+    const user = await User.findById(id); // mongoose query
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    // handle invalid ObjectId or other errors
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+},
+
   // @desc    Delete user (admin only)
   // @route   DELETE /api/auth/users/:id
   deleteUser: async (req, res) => {
