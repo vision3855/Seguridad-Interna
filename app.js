@@ -5,6 +5,7 @@ const ingresoRoutes = require("./routes/ingresoPatana.routes.js");
 //const imageRoutes = require('./routes/imagesRoutes');
 const imageRoutes = require('./routes/imagesRoute.js');
 const visitRoutes = require('./routes/visitReport.route.js');
+const filterRoutes = require("./routes/PatanaRoutes.js");
 
 require("dotenv").config();
 
@@ -62,6 +63,7 @@ app.use('/api/images', imageRoutes);
 app.use("/patana", patanaRoutes);
 app.use("/ingreso", ingresoRoutes);
 app.use("/visit", visitRoutes);
+app.use("/api/patanas", filterRoutes);
 
 app.get("/", (req, res) => {
   res.send("Well well");
